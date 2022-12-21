@@ -129,7 +129,7 @@ func interfaceLimitMiddleware(handler http.Handler) http.Handler {
 }
 
 // 这里把限流中间件和日志中间件分开
-func logLimitMiddleware(handler http.Handler) http.Handler {
+func logMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		filePath := "D:\\go开发\\exec\\apps\\log.log"
 		file, _ := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE, 0666)
@@ -145,7 +145,7 @@ func main() {
 	////有请求进来就取令牌
 	r := core.NewRouter()
 	r.Use(interfaceLimitMiddleware)
-	r.Use(logLimitMiddleware)
+	r.Use(logMiddleware)
 	http.Handle("/", r.Chain(http.HandlerFunc(echo)))
 	http.Handle("/404.html", r.Chain(http.HandlerFunc(html404)))
 	http.ListenAndServe("localhost:8080", nil)
