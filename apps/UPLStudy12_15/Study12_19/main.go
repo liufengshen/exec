@@ -1,8 +1,8 @@
 package main
 
 import (
+	"apps/apps/UPLStudy12_15/Study12_19/config"
 	"encoding/json"
-	core "exec/UPLStudy12_15/Study12_19/config"
 	"fmt"
 	"github.com/spf13/viper"
 	"html/template"
@@ -30,7 +30,7 @@ func init() {
 	config = viper.New()
 	config.SetConfigType("yaml")
 	//config.AddConfigPath("./config/")
-	config.SetConfigFile("D:\\go开发\\exec\\apps\\UPLStudy12_15\\Study12_19\\config.yaml")
+	config.SetConfigFile("config.yaml")
 	var err error
 	err = config.ReadInConfig()
 	if err != nil {
@@ -131,7 +131,7 @@ func interfaceLimitMiddleware(handler http.Handler) http.Handler {
 // 这里把限流中间件和日志中间件分开
 func logMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		filePath := "D:\\go开发\\exec\\apps\\log.log"
+		filePath := "log.log"
 		file, _ := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE, 0666)
 		file.Write([]byte("路径 " + request.URL.Path + "  "))
 		start := time.Now()
@@ -146,7 +146,7 @@ func main() {
 	r := core.NewRouter()
 	r.Use(interfaceLimitMiddleware)
 	r.Use(logMiddleware)
-	http.Handle("/", r.Chain(http.HandlerFunc(echo)))
-	http.Handle("/404.html", r.Chain(http.HandlerFunc(html404)))
+	r.HandleChain("/", echo)
+	r.HandleChain("/404.html", html404)
 	http.ListenAndServe("localhost:8080", nil)
 }
